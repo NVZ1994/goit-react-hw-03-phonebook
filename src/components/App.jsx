@@ -1,5 +1,5 @@
 import { Component } from "react"
-import initialContacts from '../contacts.json'
+// import initialContacts from '../contacts.json'
 import { nanoid } from 'nanoid'
 import { ContactList } from "./ContactList/ContactList"
 import { Filter } from "./FilterInput/Filter"
@@ -9,7 +9,7 @@ import './App.css'
 
 export class App extends Component {
   state = {
-    contacts: initialContacts,
+    contacts: [],
     filter: ''
   }
 
@@ -25,7 +25,6 @@ export class App extends Component {
   }
 
   handleDeleteContact = (id) => {
-    console.log('hi')
     this.setState((prevState) => ({contacts: prevState.contacts.filter(contact => contact.id !== id)}))
   }
 
@@ -39,7 +38,19 @@ export class App extends Component {
     return contacts.filter(contact => contact.name.toLowerCase().includes(filter.toLowerCase()))
   }
 
+  componentDidUpdate(prevProps, prevState){
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts))
+    }
+  }
 
+  componentDidMount() {
+    const storageContacts = JSON.parse(localStorage.getItem('contacts'))
+    if (storageContacts) {
+      this.setState({ contacts: storageContacts })
+    }
+  }
+  
   render() {
     const {filter, contacts} = this.state
     return (
